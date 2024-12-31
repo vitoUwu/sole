@@ -20,17 +20,6 @@ export default createEvent({
 			return;
 		}
 
-		const me = await guild.members
-			.fetch(guild.client.user.id)
-			.catch(() => null);
-
-		if (!me || !me.permissions.has("ManageRoles")) {
-			console.log(
-				`Ignoring presence update because I don't have permission to manage roles in ${guild.name} (${guild.id})`,
-			);
-			return;
-		}
-
 		const newStatus = newPresence.activities?.find(
 			(activity) => activity.type === ActivityType.Custom,
 		)?.state;
@@ -38,7 +27,11 @@ export default createEvent({
 			(activity) => activity.type === ActivityType.Custom,
 		)?.state;
 
-		if (newStatus === oldStatus || (!newStatus && !oldStatus)) {
+		if (
+			newStatus === oldStatus ||
+			(!newStatus && !oldStatus) ||
+			(oldPresence?.status !== "offline" && newPresence?.status === "offline")
+		) {
 			return;
 		}
 
@@ -53,6 +46,17 @@ export default createEvent({
 			!guildData.settings?.statusRegex ||
 			!guildData.settings?.roles?.length
 		) {
+			return;
+		}
+
+		const me = await guild.members
+			.fetch(guild.client.user.id)
+			.catch(() => null);
+
+		if (!me || !me.permissions.has("ManageRoles")) {
+			console.log(
+				`Ignoring presence update because I don't have permission to manage roles in ${guild.name} (${guild.id})`,
+			);
 			return;
 		}
 

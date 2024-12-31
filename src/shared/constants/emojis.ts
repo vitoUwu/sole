@@ -9,6 +9,8 @@ const emojis =
 				right_arrow: "<:right_arrow:1323653003089154110>",
 				settings:
 					"<:settings_1:1323655950321586176><:settings_2:1323655963420528650><:settings_3:1323655977093824533><:settings_4:1323655987957071972>",
+				guilds:
+					"<:guilds_1:1323696891023724554><:guilds_2:1323696904105885828><:guilds_3:1323696915816255519><:guilds_4:1323696925496840272>",
 			}
 		: {
 				regex:
@@ -17,6 +19,8 @@ const emojis =
 				right_arrow: "<:right_arrow:1323657567624499201>",
 				settings:
 					"<:settings_1:1323657459692470323><:settings_2:1323657477459542066><:settings_3:1323657489052336229><:settings_4:1323657498745638973>",
+				guilds:
+					"<:guilds_1:1323793464919457945><:guilds_2:1323793476101472411><:guilds_3:1323793486138441738><:guilds_4:1323793498520031416>",
 			};
 
 export default emojis;

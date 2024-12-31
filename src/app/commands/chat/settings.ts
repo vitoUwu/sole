@@ -36,10 +36,15 @@ export default createCommand({
 			}
 
 			return interaction.reply({
-				content:
-					`${emojis.settings}` +
-					`\n\n${emojis.regex}${emojis.right_arrow}\`${guildData.settings?.statusRegex || "Not set"}\`` +
-					`\n${emojis.role}${emojis.right_arrow}${guildData.settings?.roles?.[0] ? `<@&${guildData.settings.roles[0]}>` : "Not set"}`,
+				embeds: [
+					{
+						color: 0x2b2d31,
+						description:
+							`${emojis.settings}` +
+							`\n\n${emojis.regex}${emojis.right_arrow}\`${guildData.settings?.statusRegex || "Not set"}\`` +
+							`\n${emojis.role}${emojis.right_arrow}${guildData.settings?.roles?.[0] ? `<@&${guildData.settings.roles[0]}>` : "Not set"}`,
+					},
+				],
 				ephemeral: true,
 			});
 		}

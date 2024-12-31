@@ -27,10 +27,15 @@ export default createEvent({
 			(activity) => activity.type === ActivityType.Custom,
 		)?.state;
 
+		const wentOnline =
+			oldPresence?.status === "offline" && newPresence?.status !== "offline";
+		const wentOffline =
+			oldPresence?.status !== "offline" && newPresence?.status === "offline";
+
 		if (
-			newStatus === oldStatus ||
-			(!newStatus && !oldStatus) ||
-			(oldPresence?.status !== "offline" && newPresence?.status === "offline")
+			(newStatus === oldStatus && !wentOnline) ||
+			(!newStatus && !oldStatus && !wentOnline) ||
+			wentOffline
 		) {
 			return;
 		}

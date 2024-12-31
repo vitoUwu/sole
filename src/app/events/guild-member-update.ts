@@ -15,6 +15,17 @@ export default createEvent({
 			return;
 		}
 
+		const me = await guild.members
+			.fetch(guild.client.user.id)
+			.catch(() => null);
+
+		if (!me || !me.permissions.has("ManageRoles")) {
+			console.log(
+				`Ignoring presence update because I don't have permission to manage roles in ${guild.name} (${guild.id})`,
+			);
+			return;
+		}
+
 		const newStatus = newPresence.activities?.find(
 			(activity) => activity.type === ActivityType.Custom,
 		)?.state;
@@ -42,7 +53,16 @@ export default createEvent({
 
 		const roles = guildData.settings.roles
 			.map((role) => guild.roles.cache.get(role))
-			.filter((role): role is Role => role !== undefined);
+			.filter(
+				(role): role is Role =>
+					// biome-ignore lint/complexity/useOptionalChain: ignore
+					role !== undefined && role.editable && !role.managed,
+			);
+
+		if (!roles.length) {
+			console.log(`No roles found in ${guild.name} (${guild.id})`);
+			return;
+		}
 
 		if (newStatus) {
 			const match = new RegExp(guildData.settings.statusRegex).test(newStatus);

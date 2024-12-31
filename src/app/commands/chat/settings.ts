@@ -38,17 +38,38 @@ export default createCommand({
 
 		const filter = { _id: interaction.guildId };
 		const update = { $set: { settings: { ...guildData?.settings } } };
+		const warnings: string[] = [];
+		let settingsUpdated = false;
 
 		if (statusRegex) {
 			update.$set.settings.statusRegex = statusRegex;
+			settingsUpdated = true;
 		}
 
+		const me = await interaction.guild.members.fetch(
+			interaction.client.user.id,
+		);
 		if (role) {
-			update.$set.settings.roles = [role.id];
+			const cantAssignReason = !role.editable
+				? "role is not editable"
+				: role.managed
+					? "role is managed"
+					: !me.permissions.has("ManageRoles")
+						? "I don't have permission to manage roles"
+						: null;
+			if (cantAssignReason) {
+				warnings.push(`I can't assign the role because "${cantAssignReason}"`);
+			} else {
+				update.$set.settings.roles = [role.id];
+				settingsUpdated = true;
+			}
 		}
 
 		await guildModel.updateOne(filter, update, { upsert: true, new: true });
 
-		return interaction.reply({ content: "Settings updated.", ephemeral: true });
+		return interaction.reply({
+			content: `${settingsUpdated ? "Settings updated." : "No settings updated."} ${warnings.length ? `\n${warnings.join("\n")}` : ""}`,
+			ephemeral: true,
+		});
 	},
 });

@@ -12,6 +12,19 @@ class InteractionService {
 	 * @param interaction The interaction to handle
 	 */
 	public async handleInteraction(interaction: Interaction) {
+		if (!interaction.guildId) {
+			return;
+		}
+
+		if (!interaction.guild) {
+			const guild = await interaction.client.guilds
+				.fetch(interaction.guildId)
+				.catch(() => null);
+			if (!guild) {
+				return;
+			}
+		}
+
 		try {
 			if (interaction.isCommand()) {
 				console.log(

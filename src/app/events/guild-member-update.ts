@@ -1,10 +1,15 @@
 import { ActivityType, type Role } from "discord.js";
-import guildModel from "../../core/database/model/guild.model.js";
+import GuildService from "../../services/GuildService.js";
 import createEvent from "../../shared/factories/event.js";
 
 export default createEvent({
 	name: "presenceUpdate",
 	async execute(oldPresence, newPresence) {
+		if (oldPresence?.user?.bot || newPresence?.user?.bot) {
+			console.log("Ignoring presence update because user is a bot");
+			return;
+		}
+
 		const guild = newPresence.guild;
 
 		if (!guild) {
@@ -33,7 +38,7 @@ export default createEvent({
 			(activity) => activity.type === ActivityType.Custom,
 		)?.state;
 
-		if (newStatus === oldStatus && !!newStatus && !!oldStatus) {
+		if (newStatus === oldStatus || (!newStatus && !oldStatus)) {
 			return;
 		}
 
@@ -41,7 +46,7 @@ export default createEvent({
 			`${newPresence.user?.username} (${newPresence.user?.id}) changed status from ${oldStatus} to ${newStatus} in ${guild?.name} (${guild?.id})`,
 		);
 
-		const guildData = await guildModel.findById(guild.id);
+		const guildData = await GuildService.findById(guild.id);
 
 		if (
 			!guildData ||

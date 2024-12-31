@@ -3,7 +3,7 @@ import {
 	ApplicationCommandOptionType,
 	type Role,
 } from "discord.js";
-import guildModel from "../../../core/database/model/guild.model.js";
+import GuildService from "../../../services/GuildService.js";
 import createCommand from "../../../shared/factories/commands/index.js";
 
 export default createCommand({
@@ -30,7 +30,7 @@ export default createCommand({
 			});
 		}
 
-		const guildData = await guildModel.findById(interaction.guildId);
+		const guildData = await GuildService.findById(interaction.guildId);
 
 		if (
 			!guildData ||

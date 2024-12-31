@@ -12,4 +12,5 @@ function safeEnv<T extends Record<string, unknown>>(
 export default safeEnv({
 	DISCORD_TOKEN: process.env.DISCORD_TOKEN,
 	MONGO_URI: process.env.MONGO_URI,
+	NODE_ENV: process.env.NODE_ENV || "production",
 });

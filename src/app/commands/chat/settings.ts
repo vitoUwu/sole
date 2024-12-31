@@ -1,7 +1,6 @@
 import { ApplicationCommandOptionType } from "discord.js";
-import guildModel, {
-	type GuildUpdate,
-} from "../../../core/database/model/guild.model.js";
+import GuildService from "../../../services/GuildService.js";
+import emojis from "../../../shared/constants/emojis.js";
 import createCommand from "../../../shared/factories/commands/index.js";
 
 export default createCommand({
@@ -26,15 +25,24 @@ export default createCommand({
 	async execute(interaction) {
 		const statusRegex = interaction.options.getString("status_regex");
 		const role = interaction.options.getRole("role");
+		const guildData = await GuildService.findById(interaction.guildId);
 
 		if (!statusRegex && !role) {
+			if (!guildData) {
+				return interaction.reply({
+					content: "Not set up yet. Please provide any of the options.",
+					ephemeral: true,
+				});
+			}
+
 			return interaction.reply({
-				content: "Please provide any of the options.",
+				content:
+					`${emojis.settings}` +
+					`\n\n${emojis.regex}${emojis.right_arrow}\`${guildData.settings?.statusRegex || "Not set"}\`` +
+					`\n${emojis.role}${emojis.right_arrow}${guildData.settings?.roles?.[0] ? `<@&${guildData.settings.roles[0]}>` : "Not set"}`,
 				ephemeral: true,
 			});
 		}
-
-		const guildData = await guildModel.findById(interaction.guildId);
 
 		const filter = { _id: interaction.guildId };
 		const update = { $set: { settings: { ...guildData?.settings } } };
@@ -65,7 +73,7 @@ export default createCommand({
 			}
 		}
 
-		await guildModel.updateOne(filter, update, { upsert: true, new: true });
+		await GuildService.update(filter, update, { upsert: true });
 
 		return interaction.reply({
 			content: `${settingsUpdated ? "Settings updated." : "No settings updated."} ${warnings.length ? `\n${warnings.join("\n")}` : ""}`,

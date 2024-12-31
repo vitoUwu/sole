@@ -29,6 +29,7 @@ const GuildSchema = new Schema(
 	},
 );
 
+export type GuildSchema = InferSchemaType<typeof GuildSchema>;
 export type GuildDocument = InferSchemaType<typeof GuildSchema> & Document;
 export type GuildFilter = FilterQuery<typeof GuildSchema>;
 export type GuildUpdate = UpdateQuery<typeof GuildSchema>;

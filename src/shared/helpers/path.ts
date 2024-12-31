@@ -1,6 +1,6 @@
 import { readdirSync } from "node:fs";
 import { sep } from "node:path";
-import { ROOT } from "../constants.js";
+import { ROOT } from "../constants/index.js";
 
 /**
  * Reads a directory recursively and returns the paths of all files

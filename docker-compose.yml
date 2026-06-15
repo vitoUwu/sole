@@ -1,0 +1,8 @@
+services:
+  bot:
+    build: .
+    image: sole-bot
+    container_name: sole-bot
+    restart: unless-stopped
+    env_file:
+      - .env

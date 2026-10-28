@@ -25,5 +25,19 @@ export default createEvent({
 		);
 
 		console.log(`${guildsNotInDatabase.length} guilds were created`);
+
+		// Discord sends presence updates with a partial user (id only), and
+		// discord.js drops them for users it hasn't cached, so offline members
+		// at startup would never get their roles.
+		for (const guild of guilds) {
+			await guild.members
+				.fetch()
+				.then((members) =>
+					console.log(`Cached ${members.size} members of ${guild.name}`),
+				)
+				.catch((error) =>
+					console.error(`Failed to fetch members of ${guild.name}`, error),
+				);
+		}
 	},
 });

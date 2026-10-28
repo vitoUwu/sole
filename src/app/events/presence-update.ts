@@ -54,6 +54,15 @@ export default createEvent({
 			return;
 		}
 
+		const member =
+			newPresence.member && !newPresence.member.partial
+				? newPresence.member
+				: await guild.members.fetch(newPresence.userId).catch(() => null);
+
+		if (!member || member.user.bot) {
+			return;
+		}
+
 		const me = await guild.members
 			.fetch(guild.client.user.id)
 			.catch(() => null);
@@ -84,26 +93,28 @@ export default createEvent({
 				console.log(
 					`"${newStatus}" matches with "${guildData.settings.statusRegex}". Adding roles ${roles.map((role) => role.name).join(", ")}`,
 				);
-				await newPresence.member?.roles.add(roles);
-			} else if (
-				newPresence.member?.roles.cache.hasAny(...roles.map((role) => role.id))
-			) {
+				for (const role of roles) {
+					await member.roles.add(role);
+				}
+			} else if (member.roles.cache.hasAny(...roles.map((role) => role.id))) {
 				console.log(
 					`"${newStatus}" does not match with "${guildData.settings.statusRegex}". Removing roles ${roles.map((role) => role.name).join(", ")}`,
 				);
-				await newPresence.member?.roles.remove(roles);
+				for (const role of roles) {
+					await member.roles.remove(role);
+				}
 			}
 
 			return;
 		}
 
-		if (
-			newPresence.member?.roles.cache.hasAny(...roles.map((role) => role.id))
-		) {
+		if (member.roles.cache.hasAny(...roles.map((role) => role.id))) {
 			console.log(
-				`${newPresence.user?.username} (${newPresence.user?.id}) status does not match anymore. Removing roles ${roles.map((role) => role.name).join(", ")}`,
+				`${member.user.username} (${member.id}) status does not match anymore. Removing roles ${roles.map((role) => role.name).join(", ")}`,
 			);
-			await newPresence.member?.roles.remove(roles);
+			for (const role of roles) {
+				await member.roles.remove(role);
+			}
 		}
 	},
 });

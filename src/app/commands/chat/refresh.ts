@@ -56,11 +56,15 @@ export default createCommand({
 		)?.state;
 
 		if (!status || !new RegExp(guildData.settings.statusRegex).test(status)) {
-			await member.roles.remove(roles);
+			for (const role of roles) {
+				await member.roles.remove(role);
+			}
 			return interaction.reply({ content: "Roles removed.", ephemeral: true });
 		}
 
-		await member.roles.add(roles);
+		for (const role of roles) {
+			await member.roles.add(role);
+		}
 		return interaction.reply({ content: "Roles refreshed.", ephemeral: true });
 	},
 });
